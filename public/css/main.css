@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Project-Specific Styles
+
+   Project: CARE Cats
+   Author: Katherine Wyman
+   ========================================================================== */
+
+
+/* ------------------------------------------------
+   Large Scale Structure
+------------------------------------------------ */
+* {
+	margin: 0;
+}
+html, body {
+	height: 100%;
+}
+header{
+    text-align: center;
+}
+.wrapper {
+	min-height: 100%;
+	height: auto !important; /* This line and the next line are not necessary unless you need IE6 support */
+	height: 100%;
+	margin: 0 auto -100px; /* the bottom margin is the negative value of the footer's height */
+}
+
+/* ------------------------------------------------
+    Home Page
+------------------------------------------------ */
+
+.image-carousel img{
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------
+    Footer
+------------------------------------------------ */
+.push {
+	height: 100px; /* .push must be the same height as .footer */
+}
+footer {
+	height: 100px;
+    width: 100%;
+    padding:10px;
+    background-color: #222;
+}
+.social-links-bottom ul{
+    list-style: none;
+    list-style-type: none;
+
+}
+.social-links-bottom li{
+    float:left;
+    padding:10px;
+}
+.social-links-bottom i{
+    color:#888;
+    font-size: 25px;
+}
