@@ -25,10 +25,10 @@ class CreateAnimalsTable extends Migration
             # The rest of the fields...
             $table->string('name');
             $table->string('sub_species'); // tiger, lion, bobcat...
-            $table->string('enclosure'); // numbers?
-            $table->date('date_of_birth');
-            $table->date('rainbow_bridge_date'); // date of passing
+            $table->string('enclosure'); // numbers? Letters?
+            $table->date('birth_date');
             $table->date('care_date'); // date they came to CARE
+            $table->date('rainbow_date'); // date of passing
 
         });
     }

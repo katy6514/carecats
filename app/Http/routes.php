@@ -18,6 +18,107 @@ Route::get('/', function () {
 Route::get('/cats','CatController@getIndex');
 Route::post('/cats','CatController@postIndex');
 
+
+Route::get('/createCat', function() {
+    $animal = new \CareCats\Animal();
+
+    $animal->name = "Tabula";
+    $animal->enclosure = "F";
+
+    $animal->save();
+
+    echo "Added: ".$animal->name;
+
+});
+Route::get('/readCat', function() {
+    // $animals = \CareCats\Animal::first();
+    //
+    // dump($animals);
+
+
+    $animals = \CareCats\Animal::all();
+    # Make sure we have results before trying to print them...
+    if(!$animals->isEmpty()) {
+
+        // Output the books
+        foreach($animals as $animal) {
+            echo $animal->name.'<br>';
+        }
+    }
+    else {
+        echo 'No animals found';
+    }
+});
+
+Route::get('/updateCat', function() {
+});
+
+
+Route::get('/deleteCat', function() {
+});
+
+
+Route::get('/practice', function() {
+
+    // $data = Array('foo' => 'bar');
+    // Debugbar::info($data);
+    // Debugbar::error('Error!');
+    // Debugbar::warning('Watch out…');
+    // Debugbar::addMessage('Another message', 'mylabel');
+    //
+    // return 'Practice';
+    // Use the QueryBuilder to get all the books
+    $animals = DB::table('animals')->get();
+
+    // Output the results
+    foreach ($animals as $animal) {
+        echo $animal->name;
+    }
+});
+
+Route::get('/faker', function () {
+    $faker = Faker\Factory::create();
+
+    $dates = array();
+
+    for ($i=0; $i < 3; $i++) {
+        array_push($dates, $faker->date($format = 'Y-m-d', $max = 'now'));
+    }
+
+    sort($dates);
+    dump($dates[0]);
+    dump($dates[1]);
+    dump($dates[2]);
+
+    // echo min($dates);
+    // echo "<br />";
+    // echo max($dates);
+
+    // generate data by accessing properties
+    // echo $faker->name;
+    //   // 'Lucy Cechtelar';
+    // echo $faker->address;
+    //   // "426 Jordy Lodge
+    //   // Cartwrightshire, SC 88120-6700"
+    // echo $faker->text;
+    // echo $faker->date($format = 'm-d-Y', $max = 'now');
+    // echo "<br />";
+    // echo $faker->date($format = 'm-d-Y', $max = 'now');
+});
+
+
+Route::get('/drop', function() {
+
+    if(App::environment('local')) {
+
+        DB::statement('DROP database carecats');
+        DB::statement('CREATE database carecats');
+
+        return 'Dropped carecats; created carecats.';
+    };
+});
+
+
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 Route::get('/debug', function() {
 
@@ -52,26 +153,4 @@ Route::get('/debug', function() {
 
     echo '</pre>';
 
-});
-Route::get('/practice', function() {
-
-    $data = Array('foo' => 'bar');
-    Debugbar::info($data);
-    Debugbar::error('Error!');
-    Debugbar::warning('Watch out…');
-    Debugbar::addMessage('Another message', 'mylabel');
-
-    return 'Practice';
-
-});
-Route::get('/faker', function () {
-    $faker = Faker\Factory::create();
-
-    // generate data by accessing properties
-    echo $faker->name;
-      // 'Lucy Cechtelar';
-    echo $faker->address;
-      // "426 Jordy Lodge
-      // Cartwrightshire, SC 88120-6700"
-    echo $faker->text;
 });
