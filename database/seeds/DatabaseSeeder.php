@@ -16,6 +16,12 @@ class DatabaseSeeder extends Seeder
 
         // $this->call(UserTableSeeder::class);
         $this->call(AnimalsTableSeeder::class);
+        $this->call(ProceduresTableSeeder::class);
+        $this->call(SponsorsTableSeeder::class);
+        $this->call(AnimalSponsorTableSeeder::class);
+        $this->call(UsersTableSeeder::class);
+
+
 
         Model::reguard();
     }

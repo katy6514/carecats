@@ -15,42 +15,214 @@ Route::get('/', function () {
     return view('index');
 });
 
-Route::get('/cats','CatController@getIndex');
-Route::post('/cats','CatController@postIndex');
 
+Route::get('/animals/{sub_species?}', 'AnimalController@getIndex');
+
+
+Route::get('/animal/edit/{id?}', 'AnimalController@getEdit');
+Route::post('/animal/edit', 'AnimalController@postEdit');
+
+Route::get('/animal/create', 'AnimalController@getCreate');
+Route::post('/animal/create', 'AnimalController@postCreate');
+
+Route::get('/animals/show/{id?}', 'AnimalController@getShow');
+
+
+
+
+
+
+
+Route::get('/test', function(){
+
+    // $animal1 = DB::table('animals')->where('id', '=', 1)->first();
+    // dump($animal1->name);
+});
 
 Route::get('/createCat', function() {
+
+    $faker = Faker\Factory::create();
+
     $animal = new \CareCats\Animal();
 
+    $dates = array();
+    for ($j=0; $j < 3; $j++) {
+        array_push($dates, $faker->date($format = 'Y-m-d', $max = 'now'));
+    }
+    sort($dates);
+
     $animal->name = "Tabula";
+    $animal->sex = "female";
+    $animal->sub_species = "lion";
     $animal->enclosure = "F";
+    $animal->birth_date = $dates[0];
+    $animal->care_date = $dates[1];
+    $animal->rainbow_date = $dates[2];
 
     $animal->save();
 
     echo "Added: ".$animal->name;
 
 });
-Route::get('/readCat', function() {
-    // $animals = \CareCats\Animal::first();
-    //
-    // dump($animals);
+
+// Route::get('/readCat', function() {
+//     // $animals = \CareCats\Animal::first();
+//     //
+//     // dump($animals);
+//
+//
+//     $animals = \CareCats\Animal::where('sub_species', 'LIKE', '%tiger%')->get();
+//     # Make sure we have results before trying to print them...
+//     if(!$animals->isEmpty()) {
+//
+//         // Output the procedures
+//         foreach($animals as $animal) {
+//             echo $animal->name.' : '.$animal->sub_species.'<br>';
+//         }
+//     }
+//     else {
+//         echo 'No animals found';
+//     }
+// });
 
 
-    $animals = \CareCats\Animal::all();
-    # Make sure we have results before trying to print them...
-    if(!$animals->isEmpty()) {
 
-        // Output the books
+Route::get('/updateCat', function() {
+    # First get a procedure to update
+    $animals = \CareCats\Animal::where('sub_species', 'LIKE', '%tiger%')->get();
+
+    # If we found the procedure, update it
+    if($animals) {
+
         foreach($animals as $animal) {
-            echo $animal->name.'<br>';
+            # Give it a different title
+            $animal->sub_species = 'lion';
+
+            # Save the changes
+            $animal->save();
         }
+
+        echo "Update complete; check the database to see if your update worked...";
     }
     else {
-        echo 'No animals found';
+        echo "Animals not found, can't update.";
+    }
+
+});
+
+Route::get('/modelCat', function() {
+
+    $animal = new \CareCats\Animal;
+    $animal->name = 'Ace';
+    $animal->sex = 'male';
+    $animal->sub_species = 'jaguar';
+    $animal->enclosure = 'J';
+
+    $animal->save();
+    dump($animal->toArray());
+
+    $procedure = new \CareCats\Procedure;
+    $procedure->title = "Hates Derek";
+    $procedure->symptoms = "grumpy around derek";
+    $procedure->comments = "nothing to do!";
+    $procedure->animal()->associate($animal); # <--- Associate the author with this procedure
+
+    $procedure->save();
+    dump($procedure->toArray());
+
+});
+
+
+Route::get('/modelQuery', function() {
+    $procedure = \CareCats\Procedure::first();
+
+    dump($procedure->toArray());
+
+    # Get the animal from this procedure using the "animal" dynamic property
+    # "animal" corresponds to the the relationship method defined in the procedure model
+    $animal = $procedure->animal;
+
+    dump($animal->toArray());
+
+    echo $procedure->title." was performed on ".$animal->name;
+
+    # Gets all procedures and the animals they were performed on
+    $procedures = \CareCats\Procedure::with('animal')->get();
+
+    dump($procedures->toArray());
+
+
+});
+
+Route::get('/eagerCat', function() {
+    # If you're querying for many things, you may want to join in the related data with the query. This can be done via the with() method and is referred to as eager loading:
+    # Eager load the animal with the procedure
+    $procedures = \CareCats\Procedure::with('animal')->get();
+
+    foreach($procedures as $procedure) {
+        echo 'Name: '.$procedure->animal->name.', procedure: '.$procedure->title.'<br>';
+    }
+
+
+});
+
+Route::get('/sponsorCat', function() {
+    // $book = \App\Book::where('title','=','The Great Gatsby')->first();
+    //
+    // echo $book->title.' is tagged with: ';
+    // foreach($book->tags as $tag) {
+    //     echo $tag->name.' ';
+    // }
+
+    $animal = \CareCats\Animal::where('name','=','Matt')->first();
+
+    echo '<br /><br />'.$animal->name.' is sponsored by: ';
+    foreach($animal->sponsors as $sponsor) {
+        echo $sponsor->first_name.', ';
     }
 });
 
-Route::get('/updateCat', function() {
+Route::get('/sponsorCat2', function() {
+    #eagerly loaded
+    $animals = \CareCats\Animal::with('sponsors')->get();
+
+    foreach($animals as $animal) {
+        echo '<br>'.$animal->name.' is sponsored by: ';
+        foreach($animal->sponsors as $sponsor) {
+            echo $sponsor->first_name.', ';
+        }
+    }
+});
+
+# Show login form
+Route::get('/login', 'Auth\AuthController@getLogin');
+
+# Process login form
+Route::post('/login', 'Auth\AuthController@postLogin');
+
+# Process logout
+Route::get('/logout', 'Auth\AuthController@getLogout');
+
+# Show registration form
+Route::get('/register', 'Auth\AuthController@getRegister');
+
+# Process registration form
+Route::post('/register', 'Auth\AuthController@postRegister');
+
+Route::get('/confirm-login-worked', function() {
+
+    # You may access the authenticated user via the Auth facade
+    $user = Auth::user();
+
+    if($user) {
+        echo 'You are logged in.';
+        dump($user->toArray());
+    } else {
+        echo 'You are not logged in.';
+    }
+
+    return;
+
 });
 
 
@@ -67,7 +239,7 @@ Route::get('/practice', function() {
     // Debugbar::addMessage('Another message', 'mylabel');
     //
     // return 'Practice';
-    // Use the QueryBuilder to get all the books
+    // Use the QueryBuilder to get all the procedures
     $animals = DB::table('animals')->get();
 
     // Output the results
@@ -75,7 +247,6 @@ Route::get('/practice', function() {
         echo $animal->name;
     }
 });
-
 Route::get('/faker', function () {
     $faker = Faker\Factory::create();
 
@@ -105,8 +276,6 @@ Route::get('/faker', function () {
     // echo "<br />";
     // echo $faker->date($format = 'm-d-Y', $max = 'now');
 });
-
-
 Route::get('/drop', function() {
 
     if(App::environment('local')) {
@@ -117,8 +286,6 @@ Route::get('/drop', function() {
         return 'Dropped carecats; created carecats.';
     };
 });
-
-
 Route::get('/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 Route::get('/debug', function() {
 
