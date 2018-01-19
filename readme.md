@@ -1,3 +1,3 @@
-#CARE cats
+# CARE cats
 
-A web app for a wild cat sanctuary in Texas.
+A web app for a wildcat sanctuary in Texas.
